@@ -1,0 +1,10 @@
+{
+  "email_enabled": false,
+  "smtp_server": "smtp.gmail.com",
+  "smtp_port": 587,
+  "sender_email": "",
+  "sender_password": "",
+  "recipient_emails": [],
+  "alert_threshold": 3,
+  "dashboard_alerts": true
+}

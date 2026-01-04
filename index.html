@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceAuth Pro - Professional Voice Authentication</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --gray-light: #e2e8f0;
+            --glass: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), #3b82f6);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Auth Panel */
+        .auth-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--darker);
+            margin-bottom: 5px;
+        }
+
+        .header-text p {
+            color: var(--gray);
+            font-size: 16px;
+        }
+
+        /* User Selection */
+        .user-selection {
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .user-selection h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 18px;
+        }
+
+        .user-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-input input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--gray-light);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .user-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .user-input button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-input button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Waveform Visualization */
+        .waveform-container {
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .waveform-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .waveform-header h3 {
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .waveform-visualizer {
+            height: 120px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--gray-light);
+        }
+
+        .waveform-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100%;
+            gap: 2px;
+            padding: 10px;
+        }
+
+        .wave-bar {
+            width: 4px;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 2px 2px 0 0;
+            transition: height 0.1s ease;
+        }
+
+        /* Recording Controls */
+        .recording-controls {
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .controls-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .controls-header h3 {
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .record-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .record-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .record-button.recording {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .record-status {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .record-instruction {
+            text-align: center;
+            color: var(--gray);
+            font-size: 16px;
+        }
+
+        /* Prediction Metrics */
+        .prediction-metrics {
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .metrics-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .metrics-header h3 {
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 576px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-light);
+        }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .icon-genuine {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .icon-spoof {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        .icon-similarity {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .icon-confidence {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+        }
+
+        .metric-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .genuine-value {
+            color: var(--success);
+        }
+
+        .spoof-value {
+            color: var(--danger);
+        }
+
+        .similarity-value {
+            color: var(--primary);
+        }
+
+        .confidence-value {
+            color: var(--warning);
+        }
+
+        .metric-bar-container {
+            height: 10px;
+            background: var(--gray-light);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .metric-bar {
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        .genuine-bar {
+            background: linear-gradient(90deg, var(--success), #059669);
+        }
+
+        .spoof-bar {
+            background: linear-gradient(90deg, var(--danger), #dc2626);
+        }
+
+        .similarity-bar {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .confidence-bar {
+            background: linear-gradient(90deg, var(--warning), #d97706);
+        }
+
+        /* Results Panel */
+        .results-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .results-header h2 {
+            font-size: 24px;
+            color: var(--darker);
+        }
+
+        .result-display {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid var(--gray-light);
+            min-height: 300px;
+        }
+
+        .result-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin-bottom: 25px;
+        }
+
+        .icon-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .icon-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .icon-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .icon-info {
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--primary);
+        }
+
+        .result-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .result-message {
+            font-size: 18px;
+            color: var(--gray);
+            margin-bottom: 25px;
+            max-width: 80%;
+        }
+
+        .result-details {
+            background: rgba(37, 99, 235, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .success .detail-value {
+            color: var(--success);
+        }
+
+        .error .detail-value {
+            color: var(--danger);
+        }
+
+        .warning .detail-value {
+            color: var(--warning);
+        }
+
+        /* Dashboard Panel */
+        .dashboard-panel {
+            grid-column: 1 / -1;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 24px;
+            color: var(--darker);
+        }
+
+        .refresh-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-light);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .stat-success {
+            color: var(--success);
+        }
+
+        .stat-error {
+            color: var(--danger);
+        }
+
+        .stat-warning {
+            color: var(--warning);
+        }
+
+        .stat-primary {
+            color: var(--primary);
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-light);
+            margin-bottom: 30px;
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h3 {
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .logs-container {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--gray-light);
+        }
+
+        .logs-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .logs-header h3 {
+            font-size: 18px;
+            color: var(--dark);
+        }
+
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .logs-table th {
+            background: rgba(37, 99, 235, 0.05);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .logs-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .logs-table tr:hover {
+            background: rgba(37, 99, 235, 0.03);
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .badge-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-info {
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--primary);
+        }
+
+        footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--light);
+            padding: 20px;
+            font-size: 16px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Authentication Panel -->
+        <div class="auth-panel">
+            <div class="panel-header">
+                <div class="logo">
+                    <i class="fas fa-microphone-alt"></i>
+                </div>
+                <div class="header-text">
+                    <h1>VoiceAuth Pro</h1>
+                    <p>Advanced Voice Authentication System</p>
+                </div>
+            </div>
+
+            <!-- User Selection -->
+            <div class="user-selection">
+                <h3><i class="fas fa-user"></i> User Selection</h3>
+                <div class="user-input">
+                    <input type="text" id="userIdInput" placeholder="Enter your user ID" value="shivani">
+                    <button id="setUserBtn"><i class="fas fa-check"></i> Set User</button>
+                </div>
+            </div>
+
+            <!-- Waveform Visualization -->
+            <div class="waveform-container">
+                <div class="waveform-header">
+                    <h3><i class="fas fa-wave-square"></i> Live Waveform</h3>
+                </div>
+                <div class="waveform-visualizer">
+                    <div class="waveform-bars" id="waveformBars">
+                        <!-- Waveform bars will be generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recording Controls -->
+            <div class="recording-controls">
+                <div class="controls-header">
+                    <h3><i class="fas fa-microphone"></i> Voice Recording</h3>
+                </div>
+                <button class="record-button" id="recordBtn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <div class="record-status" id="recordStatus">Ready to Record</div>
+                <div class="record-instruction" id="recordInstruction">Click the button to start recording</div>
+            </div>
+
+            <!-- Prediction Metrics -->
+            <div class="prediction-metrics">
+                <div class="metrics-header">
+                    <h3><i class="fas fa-chart-line"></i> Real-time Predictions</h3>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon icon-genuine">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="metric-title">Genuine Confidence</div>
+                        </div>
+                        <div class="metric-value genuine-value" id="genuineValue">0.00</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar genuine-bar" id="genuineBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon icon-spoof">
+                                <i class="fas fa-user-secret"></i>
+                            </div>
+                            <div class="metric-title">Spoof Confidence</div>
+                        </div>
+                        <div class="metric-value spoof-value" id="spoofValue">0.00</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar spoof-bar" id="spoofBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon icon-similarity">
+                                <i class="fas fa-percentage"></i>
+                            </div>
+                            <div class="metric-title">Similarity Score</div>
+                        </div>
+                        <div class="metric-value similarity-value" id="similarityValue">0.000</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar similarity-bar" id="similarityBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon icon-confidence">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="metric-title">Overall Confidence</div>
+                        </div>
+                        <div class="metric-value confidence-value" id="confidenceValue">0.00</div>
+                        <div class="metric-bar-container">
+                            <div class="metric-bar confidence-bar" id="confidenceBar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="results-panel">
+            <div class="results-header">
+                <h2><i class="fas fa-poll"></i> Authentication Results</h2>
+            </div>
+            <div class="result-display" id="resultDisplay">
+                <div class="result-icon icon-info">
+                    <i class="fas fa-microphone-alt"></i>
+                </div>
+                <div class="result-title" id="resultTitle">Ready to Authenticate</div>
+                <div class="result-message" id="resultMessage">Select a user and record your voice to begin authentication</div>
+                <div class="result-details" id="resultDetails" style="display: none;">
+                    <div class="detail-item">
+                        <span class="detail-label">User ID:</span>
+                        <span class="detail-value" id="detailUserId">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Similarity:</span>
+                        <span class="detail-value" id="detailSimilarity">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Confidence:</span>
+                        <span class="detail-value" id="detailConfidence">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value" id="detailStatus">-</span>
+                    </div>
+                </div>
+                <!-- Explainability Panel -->
+                <div class="explainability-panel" id="explainabilityPanel" style="display: none; width: 100%; margin-top: 20px;">
+                    <div style="background: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 20px; text-align: left;">
+                        <h3 style="color: #d97706; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-question-circle"></i> Why was this detected as spoof/deepfake?
+                        </h3>
+                        <ul id="explanationList" style="padding-left: 20px; margin: 0;">
+                            <!-- Explanations will be populated here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Panel -->
+        <div class="dashboard-panel">
+            <div class="dashboard-header">
+                <h2><i class="fas fa-chart-bar"></i> Security Dashboard</h2>
+                <button class="refresh-button" id="refreshDashboard">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Attempts</div>
+                    <div class="stat-value stat-primary" id="totalAttempts">0</div>
+                    <div>All authentication attempts</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Successful</div>
+                    <div class="stat-value stat-success" id="successfulAttempts">0</div>
+                    <div>Genuine authentications</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Spoof Attempts</div>
+                    <div class="stat-value stat-error" id="spoofAttempts">0</div>
+                    <div>Detected spoof attacks</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Security Alerts</div>
+                    <div class="stat-value stat-warning" id="securityAlerts">0</div>
+                    <div>Emergency notifications</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-area"></i> Authentication Trends</h3>
+                </div>
+                <canvas id="authChart"></canvas>
+            </div>
+
+            <div class="logs-container">
+                <div class="logs-header">
+                    <h3><i class="fas fa-list"></i> Recent Authentication Logs</h3>
+                </div>
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Result</th>
+                            <th>Similarity</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 20px; color: var(--gray);">
+                                No authentication logs available
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer>
+            <p>VoiceAuth Pro &copy; 2025 | Secure Voice Authentication System</p>
+        </footer>
+    </div>
+
+    <script>
+        // DOM Elements
+        const userIdInput = document.getElementById('userIdInput');
+        const setUserBtn = document.getElementById('setUserBtn');
+        const recordBtn = document.getElementById('recordBtn');
+        const recordStatus = document.getElementById('recordStatus');
+        const recordInstruction = document.getElementById('recordInstruction');
+        const waveformBars = document.getElementById('waveformBars');
+        const genuineValue = document.getElementById('genuineValue');
+        const spoofValue = document.getElementById('spoofValue');
+        const similarityValue = document.getElementById('similarityValue');
+        const confidenceValue = document.getElementById('confidenceValue');
+        const genuineBar = document.getElementById('genuineBar');
+        const spoofBar = document.getElementById('spoofBar');
+        const similarityBar = document.getElementById('similarityBar');
+        const confidenceBar = document.getElementById('confidenceBar');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        const resultDetails = document.getElementById('resultDetails');
+        const detailUserId = document.getElementById('detailUserId');
+        const detailSimilarity = document.getElementById('detailSimilarity');
+        const detailConfidence = document.getElementById('detailConfidence');
+        const detailStatus = document.getElementById('detailStatus');
+        const refreshDashboard = document.getElementById('refreshDashboard');
+        const totalAttempts = document.getElementById('totalAttempts');
+        const successfulAttempts = document.getElementById('successfulAttempts');
+        const spoofAttempts = document.getElementById('spoofAttempts');
+        const securityAlerts = document.getElementById('securityAlerts');
+        const logsTableBody = document.getElementById('logsTableBody');
+
+        // State variables
+        let currentUser = 'shivani';
+        let isRecording = false;
+        let audioContext;
+        let analyser;
+        let microphone;
+        let animationFrame;
+        let websocket;
+        let chart;
+
+        // Create waveform visualization bars
+        function createWaveformBars() {
+            waveformBars.innerHTML = '';
+            for (let i = 0; i < 64; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'wave-bar';
+                bar.style.height = '5px';
+                waveformBars.appendChild(bar);
+            }
+        }
+
+        // Update waveform visualization
+        function updateWaveform() {
+            if (!analyser) return;
+
+            const bars = document.querySelectorAll('.wave-bar');
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+
+            bars.forEach((bar, index) => {
+                const value = dataArray[index] || 0;
+                const height = Math.max(5, value / 2);
+                bar.style.height = `${height}px`;
+            });
+
+            if (isRecording) {
+                animationFrame = requestAnimationFrame(updateWaveform);
+            }
+        }
+
+        // Update prediction metrics
+        function updateMetrics(genuine, spoof, similarity, confidence) {
+            genuineValue.textContent = genuine.toFixed(2);
+            spoofValue.textContent = spoof.toFixed(2);
+            similarityValue.textContent = similarity.toFixed(3);
+            confidenceValue.textContent = confidence.toFixed(2);
+
+            genuineBar.style.width = `${genuine * 100}%`;
+            spoofBar.style.width = `${spoof * 100}%`;
+            similarityBar.style.width = `${similarity * 100}%`;
+            confidenceBar.style.width = `${confidence * 100}%`;
+        }
+
+        // Update result display
+        function updateResultDisplay(title, message, type, details = null, explanations = null) {
+            // Update title and message
+            resultTitle.textContent = title;
+            resultMessage.textContent = message;
+
+            // Update icon based on type
+            const icon = resultDisplay.querySelector('.result-icon');
+            icon.className = 'result-icon';
+            if (type === 'success') {
+                icon.classList.add('icon-success');
+                icon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            } else if (type === 'error') {
+                icon.classList.add('icon-error');
+                icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+            } else if (type === 'warning') {
+                icon.classList.add('icon-warning');
+                icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            } else {
+                icon.classList.add('icon-info');
+                icon.innerHTML = '<i class="fas fa-info-circle"></i>';
+            }
+
+            // Update details if provided
+            if (details) {
+                detailUserId.textContent = details.userId || '-';
+                detailSimilarity.textContent = details.similarity || '-';
+                detailConfidence.textContent = details.confidence || '-';
+                detailStatus.textContent = details.status || '-';
+                resultDetails.style.display = 'block';
+            } else {
+                resultDetails.style.display = 'none';
+            }
+
+            // Update explainability panel if provided
+            const explainabilityPanel = document.getElementById('explainabilityPanel');
+            const explanationList = document.getElementById('explanationList');
+            if (explanations && explanations.length > 0) {
+                explanationList.innerHTML = '';
+                explanations.forEach(explanation => {
+                    const li = document.createElement('li');
+                    li.textContent = explanation;
+                    li.style.marginBottom = '10px';
+                    li.style.color = '#333';
+                    explanationList.appendChild(li);
+                });
+                explainabilityPanel.style.display = 'block';
+            } else {
+                explainabilityPanel.style.display = 'none';
+            }
+        }
+
+        // Initialize audio
+        async function initAudio() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                microphone = audioContext.createMediaStreamSource(stream);
+
+                analyser.fftSize = 128;
+                microphone.connect(analyser);
+
+                updateWaveform();
+            } catch (err) {
+                console.error('Error accessing microphone:', err);
+                updateResultDisplay(
+                    'Microphone Error',
+                    'Please allow microphone access and refresh the page',
+                    'error'
+                );
+            }
+        }
+
+        // Connect to WebSocket server
+        function connectWebSocket() {
+            // Try to connect to the WebSocket server
+            websocket = new WebSocket('ws://localhost:8001/ws');
+
+            websocket.onopen = function(event) {
+                console.log('Connected to WebSocket server');
+                recordStatus.textContent = 'Connected';
+                recordInstruction.textContent = 'Ready for voice authentication';
+            };
+
+            websocket.onmessage = function(event) {
+                const message = event.data;
+                console.log('Received message:', message);
+
+                // Parse the response and update UI
+                if (message.includes('REGISTERED')) {
+                    updateResultDisplay(
+                        'Registration Complete',
+                        `Your voice has been registered for user ${currentUser}`,
+                        'success',
+                        {
+                            userId: currentUser,
+                            status: 'Registered'
+                        }
+                    );
+                    // Reset metrics for new registration
+                    updateMetrics(0.00, 0.00, 0.000, 0.00);
+                } else if (message.includes('DEEPFAKE_DETECTED')) {
+                    // Extract explanations from message
+                    let explanations = [];
+                    if (message.includes('High spectral flatness')) {
+                        explanations.push('Detected unusually flat frequency spectrum typical of AI-generated speech');
+                    }
+                    if (message.includes('Low MFCC variation')) {
+                        explanations.push('Detected unusually consistent mel-frequency patterns typical of synthetic speech');
+                    }
+                    if (message.includes('Abnormally stable pitch')) {
+                        explanations.push('Detected unnaturally consistent pitch patterns typical of AI-generated voices');
+                    }
+                    if (message.includes('AI voice signature detected')) {
+                        explanations.push('Multiple acoustic features match known patterns of AI-generated speech');
+                    }
+                    
+                    // If no specific explanations found, use the confidence value
+                    if (explanations.length === 0) {
+                        const confidenceMatch = message.match(/confidence=([0-9.]+)/);
+                        const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0.0;
+                        explanations.push(`AI-generated voice detected with confidence ${confidence.toFixed(2)}`);
+                    }
+
+                    updateResultDisplay(
+                        'Deepfake Detected',
+                        'AI-generated voice detected. Access denied for security reasons.',
+                        'error',
+                        {
+                            userId: currentUser,
+                            status: 'Deepfake Detected'
+                        },
+                        explanations
+                    );
+                    updateMetrics(0.00, 1.00, 0.000, 1.00);
+                } else if (message.includes('LIVENESS_FAILED')) {
+                    const confidenceMatch = message.match(/confidence=([0-9.]+)/);
+                    const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0.0;
+                    
+                    updateResultDisplay(
+                        'Liveness Check Failed',
+                        'Failed to verify you are a live person. Please try again.',
+                        'warning',
+                        {
+                            userId: currentUser,
+                            confidence: confidence.toFixed(2),
+                            status: 'Liveness Failed'
+                        }
+                    );
+                    updateMetrics(1.0 - confidence, confidence, 1.0 - confidence, confidence);
+                } else if (message.includes('LIVENESS_PASSED')) {
+                    const confidenceMatch = message.match(/confidence=([0-9.]+)/);
+                    const confidence = confidenceMatch ? parseFloat(confidenceMatch[1]) : 0.0;
+                    
+                    updateResultDisplay(
+                        'Liveness Verified',
+                        'You have been verified as a live person. Proceeding with authentication.',
+                        'success',
+                        {
+                            userId: currentUser,
+                            confidence: confidence.toFixed(2),
+                            status: 'Liveness Passed'
+                        }
+                    );
+                    updateMetrics(confidence, 1.0 - confidence, confidence, confidence);
+                } else if (message.includes('ACCESS_GRANTED')) {
+                    const similarityMatch = message.match(/similarity=([0-9.]+)/);
+                    const similarity = similarityMatch ? parseFloat(similarityMatch[1]) : 0.0;
+                    
+                    updateResultDisplay(
+                        'Access Granted',
+                        `Welcome ${currentUser}! Authentication successful.`,
+                        'success',
+                        {
+                            userId: currentUser,
+                            similarity: similarity.toFixed(3),
+                            confidence: similarity.toFixed(2),
+                            status: 'Access Granted'
+                        }
+                    );
+                    updateMetrics(
+                        Math.min(1.0, similarity + 0.2),
+                        Math.max(0.0, 1.0 - similarity - 0.2),
+                        similarity,
+                        similarity
+                    );
+                } else if (message.includes('ACCESS_DENIED')) {
+                    const similarityMatch = message.match(/similarity=([0-9.]+)/);
+                    const similarity = similarityMatch ? parseFloat(similarityMatch[1]) : 0.0;
+                    
+                    updateResultDisplay(
+                        'Access Denied',
+                        'Voice authentication failed. Please try again.',
+                        'error',
+                        {
+                            userId: currentUser,
+                            similarity: similarity.toFixed(3),
+                            confidence: (1.0 - similarity).toFixed(2),
+                            status: 'Access Denied'
+                        }
+                    );
+                    updateMetrics(
+                        Math.max(0.0, similarity - 0.1),
+                        Math.min(1.0, 1.1 - similarity),
+                        similarity,
+                        1.0 - similarity
+                    );
+                } else if (message.includes('SPOOF_DETECTED')) {
+                    // Extract explanations from message
+                    let explanations = [];
+                    if (message.includes('Abnormal pitch pattern')) {
+                        explanations.push('Detected abnormally low pitch variation typical of synthetic speech');
+                    }
+                    if (message.includes('Low energy variation')) {
+                        explanations.push('Detected unusually consistent energy levels typical of replayed audio');
+                    }
+                    if (message.includes('Unusual zero crossing rate')) {
+                        explanations.push('Detected abnormal zero crossing rate pattern indicative of audio processing');
+                    }
+                    if (message.includes('Narrow spectral bandwidth')) {
+                        explanations.push('Detected narrow frequency range typical of processed or filtered audio');
+                    }
+                    if (message.includes('General anomaly detection')) {
+                        explanations.push('Multiple subtle acoustic anomalies detected that don\'t match natural human speech patterns');
+                    }
+                    
+                    // If no specific explanations found, use the probability value
+                    if (explanations.length === 0) {
+                        const spoofMatch = message.match(/prob=([0-9.]+)/);
+                        const spoofProb = spoofMatch ? parseFloat(spoofMatch[1]) : 0.0;
+                        explanations.push(`Spoof attack detected with probability ${spoofProb.toFixed(2)}`);
+                    }
+
+                    updateResultDisplay(
+                        'Spoof Detected',
+                        'Spoof attack detected. Access denied for security reasons.',
+                        'error',
+                        {
+                            userId: currentUser,
+                            status: 'Spoof Detected'
+                        },
+                        explanations
+                    );
+                    updateMetrics(
+                        0.00,
+                        1.00,
+                        0.000,
+                        1.00
+                    );
+                } else {
+                    updateResultDisplay(
+                        'Processing',
+                        'Analyzing your voice...',
+                        'info'
+                    );
+                }
+            };
+
+            websocket.onclose = function(event) {
+                console.log('WebSocket connection closed');
+                recordStatus.textContent = 'Connection Lost';
+                recordInstruction.textContent = 'Please ensure the server is running and refresh the page';
+                updateResultDisplay(
+                    'Connection Lost',
+                    'Please ensure the server is running and refresh the page',
+                    'error'
+                );
+            };
+
+            websocket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                recordStatus.textContent = 'Connection Error';
+                recordInstruction.textContent = 'Could not connect to server. Is it running?';
+                updateResultDisplay(
+                    'Connection Error',
+                    'Could not connect to server. Is it running?',
+                    'error'
+                );
+            };
+        }
+
+        // Start recording
+        function startRecording() {
+            if (!audioContext) {
+                updateResultDisplay(
+                    'Audio Error',
+                    'Audio not initialized. Please refresh the page.',
+                    'error'
+                );
+                return;
+            }
+
+            // Update UI
+            recordBtn.classList.add('recording');
+            recordStatus.textContent = 'Recording...';
+            recordInstruction.textContent = 'Speak now...';
+            isRecording = true;
+
+            // Start waveform animation
+            updateWaveform();
+
+            // In a real implementation, you would send audio data to the server
+            // For this demo, we'll simulate the process
+            setTimeout(() => {
+                if (isRecording) {
+                    stopRecording();
+                }
+            }, 3000);
+        }
+
+        // Stop recording
+        function stopRecording() {
+            // Update UI
+            recordBtn.classList.remove('recording');
+            recordStatus.textContent = 'Processing...';
+            recordInstruction.textContent = 'Analyzing your voice';
+            isRecording = false;
+
+            // Update result display
+            updateResultDisplay(
+                'Processing',
+                'Analyzing your voice...',
+                'info'
+            );
+        }
+
+        // Toggle recording
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        // Set user ID
+        function setUserId() {
+            const newUserId = userIdInput.value.trim();
+            if (newUserId) {
+                currentUser = newUserId;
+                recordInstruction.textContent = `Ready for voice authentication as ${currentUser}`;
+                
+                // Reconnect WebSocket with new user
+                if (websocket) {
+                    websocket.close();
+                }
+                connectWebSocket();
+            }
+        }
+
+        // Refresh dashboard
+        function refreshDashboardData() {
+            // In a real implementation, this would fetch data from the server
+            // For this demo, we'll simulate some data
+            
+            // Update stats
+            totalAttempts.textContent = Math.floor(Math.random() * 50) + 20;
+            successfulAttempts.textContent = Math.floor(Math.random() * 30) + 10;
+            spoofAttempts.textContent = Math.floor(Math.random() * 10) + 2;
+            securityAlerts.textContent = Math.floor(Math.random() * 5) + 1;
+            
+            // Update logs table with sample data
+            const sampleLogs = [
+                { time: '10:30:15', user: 'shivani', result: 'ACCESS_GRANTED', similarity: '0.876', confidence: '0.88' },
+                { time: '10:28:42', user: 'john', result: 'SPOOF_DETECTED', similarity: '0.421', confidence: '0.75' },
+                { time: '10:25:33', user: 'admin', result: 'ACCESS_GRANTED', similarity: '0.912', confidence: '0.91' },
+                { time: '10:22:17', user: 'guest', result: 'ACCESS_DENIED', similarity: '0.345', confidence: '0.35' },
+                { time: '10:20:05', user: 'shivani', result: 'DEEPFAKE_DETECTED', similarity: '0.123', confidence: '0.82' }
+            ];
+            
+            logsTableBody.innerHTML = '';
+            sampleLogs.forEach(log => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.time}</td>
+                    <td>${log.user}</td>
+                    <td><span class="badge badge-${log.result.includes('GRANTED') ? 'success' : log.result.includes('DENIED') ? 'error' : 'warning'}">${log.result}</span></td>
+                    <td>${log.similarity}</td>
+                    <td>${log.confidence}</td>
+                `;
+                logsTableBody.appendChild(row);
+            });
+            
+            // Update chart
+            updateChart();
+        }
+
+        // Update chart
+        function updateChart() {
+            const ctx = document.getElementById('authChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (chart) {
+                chart.destroy();
+            }
+            
+            // Sample data for the chart
+            const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const genuineData = [12, 19, 15, 17, 22, 18, 25];
+            const spoofData = [2, 3, 1, 4, 2, 1, 3];
+            const failedData = [5, 4, 6, 3, 4, 7, 2];
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Genuine',
+                            data: genuineData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Spoof Attempts',
+                            data: spoofData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Failed Attempts',
+                            data: failedData,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the application
+        function init() {
+            createWaveformBars();
+            initAudio();
+            connectWebSocket();
+            
+            // Set initial metrics
+            updateMetrics(0.00, 0.00, 0.000, 0.00);
+            
+            // Event listeners
+            recordBtn.addEventListener('click', toggleRecording);
+            setUserBtn.addEventListener('click', setUserId);
+            userIdInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    setUserId();
+                }
+            });
+            refreshDashboard.addEventListener('click', refreshDashboardData);
+            
+            // Initial dashboard data
+            refreshDashboardData();
+        }
+
+        // Start the application when the page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
