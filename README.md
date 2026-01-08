@@ -1,6 +1,6 @@
-# VoiceAuth Pro - Advanced Voice Authentication System
+# VocEx - Advanced Voice Authentication System
 
-A cutting-edge voice authentication system with real-time speaker verification and ML-powered spoof detection. Built in 48 hours for a hackathon demo.
+A cutting-edge voice authentication system with real-time speaker verification and ML-powered spoof detection. 
 
 ## Features
 
